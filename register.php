@@ -3,6 +3,7 @@
 $page_title = 'Register';
 require 'includes/header.php';
 
+// TODO: proper error handling
 // TODO: confirm password
 
 // Handle form submission
@@ -45,12 +46,12 @@ if (isset($_POST['register'])) {
 <form action="register.php" method="post">
   <div>
     <label for="username">Username</label>
-    <input type="text" name="username" />
+    <input type="text" name="username" id="username"/>
   </div>
 
   <div>
     <label for="password">Password</label>
-    <input type="password" name="password" />
+    <input type="password" name="password" id="password"/>
   </div>
 
   <input type="submit" name="register" value="Register" />

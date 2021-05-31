@@ -3,6 +3,8 @@
 $page_title = 'Login';
 require 'includes/header.php';
 
+// TODO: proper error handling
+
 // Handle form submission
 if (isset($_POST['login'])) {
   $username = isset($_POST['username']) ? $_POST['username'] : null;
@@ -45,12 +47,12 @@ if (isset($_POST['login'])) {
 <form action="login.php" method="post">
   <div>
     <label for="username">Username</label>
-    <input type="text" name="username" />
+    <input type="text" name="username" id="username"/>
   </div>
 
   <div>
     <label for="password">Password</label>
-    <input type="password" name="password" />
+    <input type="password" name="password" id="password"/>
   </div>
 
   <input type="submit" name="login" value="Login" />
