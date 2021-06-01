@@ -1,7 +1,6 @@
 <?php
 
-$page_title = 'Home';
-require 'includes/header.php';
+session_start();
 
 $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
 if (!$conn) {
@@ -21,17 +20,23 @@ $query = "SELECT
 
 $result = mysqli_query($conn, $query);
 
-if (mysqli_num_rows($result) > 0) {
-  echo '<table>
-  <thead>
-    <tr>
-      <th>Topic</th>
-      <th>Posts</th>
-      <th>Started</th>
-      <th>Latest Post</th>
-    </tr>
-  </thead>';
+$page_title = 'Home';
+require 'includes/header.php';
 
+if (mysqli_num_rows($result) > 0) { ?>
+
+  <h1>Threads</h1>
+  <table class="table">
+    <thead>
+      <tr>
+        <th>Topic</th>
+        <th>Posts</th>
+        <th>Started</th>
+        <th>Latest Post</th>
+      </tr>
+    </thead>
+
+  <?php
   while ($r = mysqli_fetch_assoc($result)) {
     // prettier-ignore
     echo '<tr>
@@ -43,6 +48,15 @@ if (mysqli_num_rows($result) > 0) {
   }
 
   echo '</table>';
+} else {
+  // No threads
+  echo '<p class="text-muted">No threads created</p>';
+}
+
+if (isset($_SESSION['username'])) {
+  echo '<a class="btn btn-outline-dark" href="new_thread.php">New Thread</a>';
+} else {
+  echo '<p class="text-muted">Log in to add a new thread</p>';
 }
 
 require 'includes/footer.php';

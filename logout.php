@@ -1,13 +1,10 @@
 <?php
 
-$page_title = 'Logout';
-require 'includes/header.php';
+session_start();
 
 $_SESSION['username'] = null;
 
-$_SESSION['redirect_message'] = 'Logged out';
+$_SESSION['alert_text'] = 'Logged out';
+$_SESSION['alert_color'] = 'success';
 header('Location: index.php');
 exit();
-
-require 'includes/footer.php';
-?>

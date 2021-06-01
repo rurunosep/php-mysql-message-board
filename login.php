@@ -1,9 +1,10 @@
 <?php
 
-$page_title = 'Login';
-require 'includes/header.php';
+session_start();
 
 // TODO: proper error handling
+// TODO: sticky form
+// TODO: client-side form validation
 
 // Handle form submission
 if (isset($_POST['login'])) {
@@ -25,38 +26,39 @@ if (isset($_POST['login'])) {
       [$password_hash] = mysqli_fetch_row($result);
       if (password_verify($password, $password_hash)) {
         $_SESSION['username'] = $username;
-        $_SESSION['redirect_message'] = 'Logged in';
+        $_SESSION['alert_text'] = 'Logged in';
+        $_SESSION['alert_color'] = 'success';
         header('Location: index.php');
         exit();
       }
     }
 
     if ($_SESSION['username'] == null) {
-      echo '<p>No user with that username and/or password</p>';
+      $_SESSION['alert_text'] = 'No user with that username and/or password';
+      $_SESSION['alert_color'] = 'danger';
     }
 
     mysqli_close($conn);
   } else {
     // Incomplete form
-    echo '<p>Enter username and password</p>';
+    $_SESSION['alert_text'] = 'Enter username and password';
+    $_SESSION['alert_color'] = 'danger';
   }
 }
+
+$page_title = 'Login';
+require 'includes/header.php';
+
 ?>
 
-<h1>Login</h1>
-<form action="login.php" method="post">
-  <div>
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username"/>
-  </div>
-
-  <div>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password"/>
-  </div>
-
-  <input type="submit" name="login" value="Login" />
-</form>
+<div style="width: 200px;">
+  <h1>Login</h1>
+  <form action="login.php" method="post">
+    <input type="text" class="form-control mb-3" name="username" placeholder="Username" />
+    <input type="password" class="form-control mb-3" name="password" placeholder="Password" />
+    <button type="submit" class="btn btn-outline-dark" name="login">Login</button>
+  </form>
+</div>
 
 <?php require 'includes/footer.php';
 ?>

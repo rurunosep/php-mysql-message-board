@@ -1,10 +1,10 @@
 <?php
 
+session_start();
+
 // TODO: proper error handling
 // must be logged in with valid user to post
 // also need valid thread id
-
-session_start();
 
 $thread_id = isset($_POST['thread_id']) ? $_POST['thread_id'] : null;
 $body = isset($_POST['body']) ? $_POST['body'] : null;
@@ -29,7 +29,8 @@ if ($thread_id && $body) {
   mysqli_stmt_execute($stmt);
 
   if (mysqli_stmt_affected_rows($stmt) == 1) {
-    $_SESSION['redirect_message'] = 'Added post';
+    $_SESSION['alert_text'] = 'Added post';
+    $_SESSION['alert_color'] = 'success';
     header("Location: thread.php?thread_id=$thread_id");
     exit();
   }

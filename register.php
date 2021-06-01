@@ -1,10 +1,11 @@
 <?php
 
-$page_title = 'Register';
-require 'includes/header.php';
+session_start();
 
 // TODO: proper error handling
 // TODO: confirm password
+// TODO: sticky form
+// TODO: client-side form validation
 
 // Handle form submission
 if (isset($_POST['register'])) {
@@ -25,37 +26,38 @@ if (isset($_POST['register'])) {
     mysqli_stmt_execute($stmt);
 
     if (mysqli_stmt_affected_rows($stmt) == 1) {
-      $_SESSION['redirect_message'] = 'Registered user';
+      $_SESSION['alert_text'] = 'Registered user';
+      $_SESSION['alert_color'] = 'success';
       header('Location: index.php');
       exit();
     } elseif (mysqli_stmt_errno($stmt) == 1062) {
       // Error 1062: Duplicate unique key
-      echo '<p>A user with that username already exists</p>';
+      $_SESSION['alert_text'] = 'A user with that username already exists';
+      $_SESSION['alert_color'] = 'danger';
     }
 
     mysqli_stmt_close($stmt);
     mysqli_close($conn);
   } else {
     // Incomplete form
-    echo '<p>Enter username and password</p>';
+    $_SESSION['alert_text'] = 'Enter username and password';
+    $_SESSION['alert_color'] = 'danger';
   }
 }
+
+$page_title = 'Register';
+require 'includes/header.php';
+
 ?>
 
-<h1>Register</h1>
-<form action="register.php" method="post">
-  <div>
-    <label for="username">Username</label>
-    <input type="text" name="username" id="username"/>
-  </div>
-
-  <div>
-    <label for="password">Password</label>
-    <input type="password" name="password" id="password"/>
-  </div>
-
-  <input type="submit" name="register" value="Register" />
-</form>
+<div style="width: 200px;">
+  <h1>Register</h1>
+  <form action="register.php" method="post">
+    <input type="text" class="form-control mb-3" name="username" placeholder="Username" />
+    <input type="password" class="form-control mb-3" name="password" placeholder="Password" />
+    <button type="submit" class="btn btn-outline-dark" name="register">Register</button>
+  </form>
+</div>
 
 <?php require 'includes/footer.php';
 ?>
