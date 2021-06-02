@@ -1,26 +1,26 @@
 <?php
 
-session_start();
+// We're assuming that we have a valid thread and user
 
-// TODO: proper error handling
-// must be logged in with valid user to post
-// also need valid thread id
+session_start();
 
 $thread_id = isset($_POST['thread_id']) ? $_POST['thread_id'] : null;
 $body = isset($_POST['body']) ? $_POST['body'] : null;
 
-if ($thread_id && $body) {
+try {
+  if (!$body)
+    throw new Exception('Enter post body');
 
   $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
-  if (!$conn) {
-    echo '<p>' . mysqli_connect_error() . '</p>';
-  }
 
-  // TODO: same as in new_thread
   // Get user ID
-  $username = $_SESSION['username'];
-  $query = "SELECT user_id FROM users WHERE username='$username'";
-  [$user_id] = mysqli_fetch_row(mysqli_query($conn, $query));
+  if (isset($_SESSION['username'])) {
+    $query = "SELECT user_id FROM users WHERE username='" . $_SESSION['username'] . "'";
+    $result = mysqli_query($conn, $query);
+    if (mysqli_num_rows($result) > 0) {
+      [$user_id] = mysqli_fetch_row($result);
+    }
+  }
 
   // Create post
   $query = 'INSERT INTO posts (thread_id, user_id, body) VALUES (?, ?, ?)';
@@ -28,10 +28,12 @@ if ($thread_id && $body) {
   mysqli_stmt_bind_param($stmt, 'iis', $thread_id, $user_id, $body);
   mysqli_stmt_execute($stmt);
 
-  if (mysqli_stmt_affected_rows($stmt) == 1) {
-    $_SESSION['alert_text'] = 'Added post';
-    $_SESSION['alert_color'] = 'success';
-    header("Location: thread.php?thread_id=$thread_id");
-    exit();
-  }
+  $_SESSION['alert_text'] = 'Added post';
+  $_SESSION['alert_color'] = 'success';
+} catch (Exception $e) {
+  $_SESSION['alert_text'] = $e->getMessage();
+  $_SESSION['alert_color'] = 'danger';
 }
+
+header("Location: thread.php?thread_id=$thread_id");
+exit();

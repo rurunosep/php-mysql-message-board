@@ -3,9 +3,6 @@
 session_start();
 
 $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
-if (!$conn) {
-  echo '<p>' . mysqli_connect_error() . '</p>';
-}
 
 // TODO: username of the poster of the first post per thread
 $query = "SELECT

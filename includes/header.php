@@ -13,7 +13,7 @@
 
   <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
     <div class="container">
-      <a class="navbar-brand" href="index.php">Home</a>
+      <a class="navbar-brand" href="index.php">MessageBoard</a>
       <div>
         <?php if (isset($_SESSION['username'])) : ?>
           <span class="navbar-text">Logged in as <?php echo $_SESSION['username']; ?></span>
@@ -26,7 +26,7 @@
     </div>
   </nav>
 
-  <div class="container mt-3">
+  <div class="container mt-3 mb-3">
 
     <?php
     if (isset($_SESSION['alert_text'], $_SESSION['alert_color'])) {

@@ -2,23 +2,18 @@
 
 session_start();
 
-// TODO: proper error handling
-// TODO: sticky form
-// TODO: client-side form validation
-
 // Handle form submission
 if (isset($_POST['login'])) {
   $username = isset($_POST['username']) ? $_POST['username'] : null;
   $password = isset($_POST['password']) ? $_POST['password'] : null;
 
-  if ($username && $password) {
+  try {
+    if (!($username && $password))
+      throw new Exception('Enter username and password');
+
     $_SESSION['username'] = null;
 
     $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
-    if (!$conn) {
-      echo '<p>' . mysqli_connect_error() . '</p>';
-    }
-
     $query = "SELECT password_hash FROM users WHERE username='$username'";
     $result = mysqli_query($conn, $query);
 
@@ -33,15 +28,10 @@ if (isset($_POST['login'])) {
       }
     }
 
-    if ($_SESSION['username'] == null) {
-      $_SESSION['alert_text'] = 'No user with that username and/or password';
-      $_SESSION['alert_color'] = 'danger';
-    }
-
-    mysqli_close($conn);
-  } else {
-    // Incomplete form
-    $_SESSION['alert_text'] = 'Enter username and password';
+    if ($_SESSION['username'] == null)
+      throw new Exception('No user with that username and/or password');
+  } catch (Exception $e) {
+    $_SESSION['alert_text'] = $e->getMessage();
     $_SESSION['alert_color'] = 'danger';
   }
 }

@@ -2,21 +2,29 @@
 
 session_start();
 
-// TODO: errors
-// no thread ID, invalid thread ID, must be logged in to post
-// TODO: client-side form validation
+// TODO: do it nicer
 
 $thread_id = isset($_GET['thread_id']) ? $_GET['thread_id'] : null;
 
-if ($thread_id) {
-  $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
-  if (!$conn) {
-    echo '<p>' . mysqli_connect_error() . '</p>';
+$html_body = "";
+try {
+  if (!$thread_id) {
+    throw new Exception('Invalid thread');
   }
+
+  $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
 
   // Get thread topic
   $query = "SELECT topic FROM threads WHERE thread_id=$thread_id";
-  $topic = mysqli_fetch_assoc(mysqli_query($conn, $query))['topic'];
+  $result = mysqli_query($conn, $query);
+  if (mysqli_num_rows($result) > 0) {
+    [$topic] = mysqli_fetch_row($result);
+  }
+
+  if (!isset($topic))
+    throw new Exception('Invalid thread');
+
+  $page_title = "View Thread - $topic";
 
   // Get posts
   $query = "SELECT username, body, posted_on
@@ -25,16 +33,13 @@ if ($thread_id) {
   WHERE thread_id=$thread_id";
   $result = mysqli_query($conn, $query);
 
-  $page_title = "View Thread - $topic";
-  require 'includes/header.php';
-
-  echo "<h1 class='mb-3'>$topic</h1>";
+  $html_body .= "<h1 class='mb-3'>$topic</h1>";
 
   // Render posts
-  echo '<div class="card bg-light mb-3"><div class="card-body">';
+  $html_body .= '<div class="card bg-light mb-3"><div class="card-body">';
   while ($post = mysqli_fetch_assoc($result)) {
     // TODO: the mb-3 on the last card is messing stuff up a bit
-    echo '
+    $html_body .= '
     <div class="card mb-3">
         <div class="card-body">
           <h5 class="card-title">' . $post['username'] . '</h5>
@@ -43,27 +48,27 @@ if ($thread_id) {
         </div>
     </div>';
   }
-  echo '</div></div>';
+  $html_body .= '</div></div>';
 
   // New post form
   if (isset($_SESSION['username'])) {
-?>
 
-    <form action='add_post.php' method='post'>
-      <input type="hidden" name="thread_id" value="<?php echo $thread_id; ?>">
+    $html_body .=
+      '<form action="add_post.php" method="post">
+      <input type="hidden" name="thread_id" value="' . $thread_id . '">
       <textarea class="form-control mb-3" name="body" placeholder="Add a Post"></textarea>
       <button type="submit" class="btn btn-outline-dark">Post</button>
-    </form>
-
-<?php
-  } else {
-    // Not logged in
-    echo '<p class="text-muted">Log in to add a post</p>';
+    </form>';
+  } else { // Not logged in
+    $html_body .= '<p class="text-muted">Log in to add a post</p>';
   }
-} else {
-  // No thread ID in request
+} catch (Exception $e) {
+  $_SESSION['alert_text'] = $e->getMessage();
+  $_SESSION['alert_color'] = 'danger';
 }
 
-require 'includes/footer.php';
+$page_title = isset($page_title) ? $page_title : 'View Thread';
 
-?>
+require 'includes/header.php';
+echo $html_body;
+require 'includes/footer.php';
