@@ -12,7 +12,7 @@ if (isset($_POST['create-thread'])) {
     if (!($topic && $body))
       throw new Exception('Enter thread topic and post');
 
-    $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
+    require 'mysql.php';
 
     // Create thread
     $query = 'INSERT INTO threads (topic) VALUES (?)';
@@ -49,7 +49,7 @@ if (isset($_POST['create-thread'])) {
 }
 
 $page_title = 'New Thread';
-require 'includes/header.php';
+require 'header.php';
 
 ?>
 
@@ -60,5 +60,5 @@ require 'includes/header.php';
   <button type="submit" class="btn btn-outline-dark" name="create-thread">Create Thread</button>
 </form>
 
-<?php require 'includes/footer.php';
+<?php require 'footer.php';
 ?>

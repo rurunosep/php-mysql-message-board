@@ -12,7 +12,7 @@ try {
     throw new Exception('Invalid thread');
   }
 
-  $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
+  require 'mysql.php';
 
   // Get thread topic
   $query = "SELECT topic FROM threads WHERE thread_id=$thread_id";
@@ -69,6 +69,6 @@ try {
 
 $page_title = isset($page_title) ? $page_title : 'View Thread';
 
-require 'includes/header.php';
+require 'header.php';
 echo $html_body;
-require 'includes/footer.php';
+require 'footer.php';

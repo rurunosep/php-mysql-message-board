@@ -2,7 +2,7 @@
 
 session_start();
 
-$conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
+require 'mysql.php';
 
 // TODO: username of the poster of the first post per thread
 $query = "SELECT
@@ -18,7 +18,7 @@ $query = "SELECT
 $result = mysqli_query($conn, $query);
 
 $page_title = 'Home';
-require 'includes/header.php';
+require 'header.php';
 
 if (mysqli_num_rows($result) > 0) { ?>
 
@@ -56,4 +56,4 @@ if (isset($_SESSION['username'])) {
   echo '<p class="text-muted">Log in to add a new thread</p>';
 }
 
-require 'includes/footer.php';
+require 'footer.php';

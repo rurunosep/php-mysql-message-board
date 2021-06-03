@@ -16,7 +16,8 @@ if (isset($_POST['register'])) {
 
     $password_hash = password_hash($password, PASSWORD_BCRYPT);
 
-    $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
+    require 'mysql.php';
+
     $query = 'INSERT INTO users (username, password_hash) VALUES (?, ?)';
     $stmt = mysqli_prepare($conn, $query);
     mysqli_stmt_bind_param($stmt, 'ss', $username, $password_hash);
@@ -36,7 +37,7 @@ if (isset($_POST['register'])) {
 }
 
 $page_title = 'Register';
-require 'includes/header.php';
+require 'header.php';
 
 ?>
 
@@ -50,5 +51,5 @@ require 'includes/header.php';
   </form>
 </div>
 
-<?php require 'includes/footer.php';
+<?php require 'footer.php';
 ?>

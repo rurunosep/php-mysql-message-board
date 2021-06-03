@@ -13,7 +13,8 @@ if (isset($_POST['login'])) {
 
     $_SESSION['username'] = null;
 
-    $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
+    require 'mysql.php';
+
     $query = "SELECT password_hash FROM users WHERE username='$username'";
     $result = mysqli_query($conn, $query);
 
@@ -37,7 +38,7 @@ if (isset($_POST['login'])) {
 }
 
 $page_title = 'Login';
-require 'includes/header.php';
+require 'header.php';
 
 ?>
 
@@ -50,5 +51,5 @@ require 'includes/header.php';
   </form>
 </div>
 
-<?php require 'includes/footer.php';
+<?php require 'footer.php';
 ?>

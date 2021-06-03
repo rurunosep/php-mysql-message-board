@@ -11,7 +11,7 @@ try {
   if (!$body)
     throw new Exception('Enter post body');
 
-  $conn = mysqli_connect('localhost', 'root', 'password', 'message_board');
+  require 'mysql.php';
 
   // Get user ID
   if (isset($_SESSION['username'])) {
