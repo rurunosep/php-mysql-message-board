@@ -2,7 +2,8 @@
 
 session_start();
 
-// TODO: do it nicer
+// TODO: Figure out how to do all this html body stuff better
+// TODO: clean up that dirty admin post/thread delete stuff
 
 $thread_id = isset($_GET['thread_id']) ? $_GET['thread_id'] : null;
 
@@ -24,26 +25,40 @@ try {
   if (!isset($topic))
     throw new Exception('Invalid thread');
 
-  $page_title = "View Thread - $topic";
+  $page_title = "$topic - RuruBoard";
 
   // Get posts
-  $query = "SELECT username, body, posted_on
+  $query = "SELECT post_id, username, body, DATE_FORMAT(posted_on, '%b %e, %Y %r') AS posted_on
   FROM posts
   JOIN users USING (user_id)
   WHERE thread_id=$thread_id";
   $result = mysqli_query($conn, $query);
 
-  $html_body .= "<h1 class='mb-3'>$topic</h1>";
+  $html_body .= '
+  <div class="d-flex justify-content-between align-items-center">
+    <h1 class="mb-3">' . $topic . '</h1>' .
+    ($_SESSION['is_admin']
+      ? '<a class="btn btn-outline-danger" href="delete_thread.php?thread_id=' . $thread_id . '">Delete</a>'
+      : '')
+    . '
+  </div>';
 
   // Render posts
-  $html_body .= '<div class="card bg-light mb-3"><div class="card-body">';
+  $html_body .= '<div class="card bg-light mb-3"><div class="card-body pb-0">';
   while ($post = mysqli_fetch_assoc($result)) {
-    // TODO: the mb-3 on the last card is messing stuff up a bit
     $html_body .= '
     <div class="card mb-3">
         <div class="card-body">
-          <h5 class="card-title">' . $post['username'] . '</h5>
-          <h6 class="card-subtitle text-muted">' . $post['posted_on'] . '</h6>
+          <div class="d-flex justify-content-between">
+            <h5 class="card-title">' . $post['username'] . '</h5>
+            <div>
+              <small class="card-text text-muted pt-none">' . $post['posted_on'] . '</small>' .
+      ($_SESSION['is_admin']
+        ? '<a class="btn btn-outline-danger ms-2" href="delete_post.php?post_id=' . $post['post_id'] . '">Delete</a>'
+        : '')
+      . '
+            </div>
+          </div>
           <p class="card-text">' . $post['body'] . '</p>
         </div>
     </div>';
@@ -51,8 +66,7 @@ try {
   $html_body .= '</div></div>';
 
   // New post form
-  if (isset($_SESSION['username'])) {
-
+  if (isset($_SESSION['user_id'])) {
     $html_body .=
       '<form action="add_post.php" method="post">
       <input type="hidden" name="thread_id" value="' . $thread_id . '">
@@ -66,8 +80,6 @@ try {
   $_SESSION['alert_text'] = $e->getMessage();
   $_SESSION['alert_color'] = 'danger';
 }
-
-$page_title = isset($page_title) ? $page_title : 'View Thread';
 
 require 'header.php';
 echo $html_body;

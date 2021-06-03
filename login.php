@@ -11,25 +11,29 @@ if (isset($_POST['login'])) {
     if (!($username && $password))
       throw new Exception('Enter username and password');
 
+    $_SESSION['user_id'] = null;
     $_SESSION['username'] = null;
+    $_SESSION['is_admin'] = false;
 
     require 'mysql.php';
 
-    $query = "SELECT password_hash FROM users WHERE username='$username'";
+    $query = "SELECT user_id, password_hash, is_admin FROM users WHERE username='$username'";
     $result = mysqli_query($conn, $query);
 
     if (mysqli_num_rows($result) > 0) {
-      [$password_hash] = mysqli_fetch_row($result);
+      [$user_id, $password_hash, $is_admin] = mysqli_fetch_row($result);
       if (password_verify($password, $password_hash)) {
+        $_SESSION['user_id'] = $user_id;
         $_SESSION['username'] = $username;
-        $_SESSION['alert_text'] = 'Logged in';
+        $_SESSION['is_admin'] = $is_admin == '1' ? true : false;
+        $_SESSION['alert_text'] = "Logged in $username";
         $_SESSION['alert_color'] = 'success';
         header('Location: index.php');
         exit();
       }
     }
 
-    if ($_SESSION['username'] == null)
+    if ($_SESSION['user_id'] == null)
       throw new Exception('No user with that username and/or password');
   } catch (Exception $e) {
     $_SESSION['alert_text'] = $e->getMessage();
@@ -37,7 +41,7 @@ if (isset($_POST['login'])) {
   }
 }
 
-$page_title = 'Login';
+$page_title = 'Login - RuruBoard';
 require 'header.php';
 
 ?>

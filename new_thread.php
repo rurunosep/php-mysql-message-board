@@ -12,6 +12,9 @@ if (isset($_POST['create-thread'])) {
     if (!($topic && $body))
       throw new Exception('Enter thread topic and post');
 
+    if (!isset($_SESSION['user_id']))
+      throw new Exception('Must be logged in to create a thread');
+
     require 'mysql.php';
 
     // Create thread
@@ -21,21 +24,10 @@ if (isset($_POST['create-thread'])) {
     mysqli_stmt_execute($stmt);
     $thread_id = mysqli_stmt_insert_id($stmt);
 
-    // Get user ID
-    if (isset($_SESSION['username'])) {
-      $query = "SELECT user_id FROM users WHERE username='" . $_SESSION['username'] . "'";
-      $result = mysqli_query($conn, $query);
-      if (mysqli_num_rows($result) > 0) {
-        [$user_id] = mysqli_fetch_row($result);
-      }
-    }
-    if (!isset($user_id))
-      throw new Exception('Must be logged in with a valid user to create a thread');
-
     // Create post
     $query = 'INSERT INTO posts (thread_id, user_id, body) VALUES (?, ?, ?)';
     $stmt = mysqli_prepare($conn, $query);
-    mysqli_stmt_bind_param($stmt, 'iis', $thread_id, $user_id, $body);
+    mysqli_stmt_bind_param($stmt, 'iis', $thread_id, $_SESSION['user_id'], $body);
     mysqli_stmt_execute($stmt);
 
     $_SESSION['alert_text'] = 'Created thread';
@@ -48,7 +40,7 @@ if (isset($_POST['create-thread'])) {
   }
 }
 
-$page_title = 'New Thread';
+$page_title = 'New Thread - RuruBoard';
 require 'header.php';
 
 ?>

@@ -26,7 +26,7 @@ if (isset($_POST['register'])) {
     if (mysqli_stmt_errno($stmt) == 1062) // Error 1062: Duplicate unique key
       throw new Exception('A user with that username already exists');
 
-    $_SESSION['alert_text'] = 'Registered user';
+    $_SESSION['alert_text'] = "Registered $username";
     $_SESSION['alert_color'] = 'success';
     header('Location: index.php');
     exit();
@@ -36,7 +36,7 @@ if (isset($_POST['register'])) {
   }
 }
 
-$page_title = 'Register';
+$page_title = 'Register - RuruBoard';
 require 'header.php';
 
 ?>

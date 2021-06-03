@@ -9,20 +9,20 @@ $query = "SELECT
     thread_id,
     topic,
     COUNT(post_id) AS num_posts,
-    MIN(posted_on) AS started_date,
-    MAX(posted_on) AS latest_post_date
+    DATE_FORMAT(MIN(posted_on), '%b %e, %Y %r') AS started_date,
+    DATE_FORMAT(MAX(posted_on), '%b %e, %Y %r') AS latest_post_date
   FROM threads
-  JOIN posts USING (thread_id)
-  GROUP BY (posts.thread_id)";
+  LEFT JOIN posts USING (thread_id)
+  GROUP BY (posts.thread_id)
+  ORDER BY latest_post_date DESC";
 
 $result = mysqli_query($conn, $query);
 
-$page_title = 'Home';
+$page_title = 'RuruBoard';
 require 'header.php';
 
 if (mysqli_num_rows($result) > 0) { ?>
 
-  <h1>Threads</h1>
   <table class="table">
     <thead>
       <tr>
@@ -50,7 +50,7 @@ if (mysqli_num_rows($result) > 0) { ?>
   echo '<p class="text-muted">No threads created</p>';
 }
 
-if (isset($_SESSION['username'])) {
+if (isset($_SESSION['user_id'])) {
   echo '<a class="btn btn-outline-dark" href="new_thread.php">New Thread</a>';
 } else {
   echo '<p class="text-muted">Log in to add a new thread</p>';
